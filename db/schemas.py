@@ -1,0 +1,1 @@
+from pydantic import model_serializer
