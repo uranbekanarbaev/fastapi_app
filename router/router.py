@@ -16,6 +16,7 @@ from auth.user_auth import get_current_user
 from auth.jwt_gen import create_access_token, pwd_context
 from db.models import User
 from loggs.logger import logger
+from fastapi import Cookie
 
 router = APIRouter()
 
@@ -56,10 +57,31 @@ def users(
 
     # Generate access token
     access_token = create_access_token(data={"sub": user.username})
-    response.set_cookie(key="access_token", value=access_token, httponly=True, samesite="Lax")
-    logger.info("Token set successfully", access_token)
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=False,
+        samesite="None",
+        secure=False,
+        path="/"  # Makes the cookie accessible throughout the domain
+    )
+    logger.info(f"Response headers after setting cookie: {response.headers}")
+    logger.info(f"Token set successfully: {access_token}")
 
     return RedirectResponse(url="/tasks", status_code=status.HTTP_302_FOUND)
+
+@router.get("/read-cookie")
+def read_cookie(some_data: str = Cookie("access_token")):
+    if some_data is None:
+        raise HTTPException(status_code=400, detail="Cookie 'some_data_in_cookies' not found")
+    return {"some_data_in_cookies": some_data}
+
+@router.get("/debug-cookie")
+async def debug_cookie(request: Request):
+    cookies = request.cookies
+    logger.info(f"All cookies in request: {cookies}")
+    token = cookies.get("access_token")
+    return {"token": token if token else "Token cookie not found"}
 
 @router.put("/users", response_class=HTMLResponse)
 def users(request: Request):
@@ -69,9 +91,13 @@ def users(request: Request):
 def users(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
 
-@router.get("/tasks", response_class=HTMLResponse)
-def users(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return templates.TemplateResponse('index.html', {"request": request})
+@router.get("/tasks")
+async def tasks(request: Request, token: str = Cookie(None)):
+    logger.info(f"Cookies received in request: {request.cookies}")
+    logger.info(f"Token received in get_current_user: {token}")
+    if not token:
+        return {"error": "Token not found"}
+    # Proceed with normal token processing
 
 @router.get("/tasks/{task_id}", response_class=HTMLResponse)
 def users(request: Request, user_id: int):
