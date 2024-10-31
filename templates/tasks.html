@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block form %}
+<h1>Create a New Task</h1>
+
+<!-- Task submission form -->
+<form action="/tasks" method="post">
+    <label for="description">Task Description:</label>
+    <input type="text" id="description" name="description" required>
+    <button type="submit">Create Task</button>
+</form>
+{% endblock %}
+
+<hr>
+
+{% block tasks %}
+    <!-- Displaying user's tasks if any -->
+    <h2>Your Tasks</h2>
+    <ul id="task-list">
+        <!-- Dynamically render the user's tasks with delete and update buttons -->
+        {% if data is iterable %}
+            {% for task in data %}
+                <li>
+                    {{ task.description }}
+                    <!-- Update button -->
+                    <form action="/tasks/{{ task.id }}" method="put" style="display: inline;">
+                        <input type="text" name="description" placeholder="New description" required>
+                        <button type="submit">Update</button>
+                    </form>
+                    <!-- Delete button -->
+                    <form action="/tasks/{{ task.id }}" method="post" style="display: inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>
+                {{ data.description }}
+                <!-- Update button -->
+                <form action="/tasks/{{ data.id }}" method="put" style="display: inline;">
+                    <input type="text" name="description" placeholder="New description" required>
+                    <button type="submit">Update</button>
+                </form>
+                <!-- Delete button -->
+                <form action="/tasks/{{ data.id }}" method="delete" style="display: inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
