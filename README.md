@@ -46,26 +46,11 @@ To get a local copy up and running, follow these steps.
 git clone https://github.com/uranbekanarbaev/fastapi_app.git
 cd fastapi_app
 
+pip install -r requirements.txt
 
 
-## Getting Started
+### API Endpoints
 
-To get a local copy up and running, follow these steps.
-
-### Prerequisites
-
-- Docker installed on your machine (if using Docker)
-- Python 3.8 or higher
-- pip (Python package installer)
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/uranbekanarbaev/fastapi_app.git
-cd fastapi_app
-
-
-API Endpoints
 Users
 GET /users: Retrieve a list of all users
 GET /users/{user_id}: Retrieve information about a specific user
