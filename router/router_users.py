@@ -3,19 +3,19 @@ from fastapi import Request, Form, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 
-from fastapi import FastAPI, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
+from fastapi import Depends
 
-from db.crud import authenticate_user, get_all_users, get_user_by_username, create_user, get_tasks_by_user, create_task, get_user_by_user_id, update_user, delete_user, get_task_by_id, update_task, delete_task
-from auth.jwt_gen import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from db.crud import (
+    authenticate_user, get_all_users, get_user_by_username,
+    create_user, get_user_by_user_id,
+    update_user, delete_user
+)
+from auth.jwt_gen import create_access_token
 from db.database import get_db
-from db.schemas import UserCreate, TaskCreate, UserResponse
+from db.schemas import UserResponse
 from sqlalchemy.orm import Session 
 from fastapi import HTTPException, status  
-from auth.user_auth import get_current_user
-from auth.jwt_gen import create_access_token, pwd_context
-from db.models import User
+from auth.jwt_gen import create_access_token
 from loggs.logger import logger
 from fastapi import Cookie
 
@@ -25,12 +25,31 @@ templates = Jinja2Templates(directory="/home/uranbekanarbaev/framework_project/t
 
 @router.get("/users", response_class=HTMLResponse)
 def users(request: Request, db: Session = Depends(get_db)):
+    """Retrieve all users.
+
+    Args:
+        request (Request): The incoming request.
+        db (Session): The database session.
+
+    Returns:
+        TemplateResponse: Renders the 'index.html' template with user data.
+    """
     data = get_all_users(db)
     logger.info(f'data available {data}')
     return templates.TemplateResponse(request, 'index.html', {"data": data})
 
 @router.get("/users/{user_id}")
-def users(request: Request, user_id: int, db: Session = Depends(get_db)):
+def get_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Retrieve a specific user by their ID.
+
+    Args:
+        request (Request): The incoming request.
+        user_id (int): The ID of the user to retrieve.
+        db (Session): The database session.
+
+    Returns:
+        User: The user data if found.
+    """
     data = get_user_by_user_id(db, user_id)
     return data
 
@@ -42,6 +61,18 @@ def users_post(
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
+    """Create a new user or authenticate an existing user.
+
+    Args:
+        response (Response): The response object.
+        username (str): The username of the user.
+        email (str): The email of the user.
+        password (str): The password of the user.
+        db (Session): The database session.
+
+    Returns:
+        JSONResponse: A response containing a message, access token, and user data.
+    """
     user = get_user_by_username(db, username)
 
     if user:
@@ -65,19 +96,30 @@ def users_post(
     response = JSONResponse(content={
             "message": "Cookie set",
             "token": access_token,
-            "user_data": UserResponse.from_orm(user).dict()  # Serialize the user data
+            "user_data": UserResponse.from_orm(user).dict()
         })
     response.set_cookie(
-    key="access_token",
-    value=access_token,
-    httponly=True,  # Protects the cookie
-    samesite="Lax",
-    secure=False  # Set True if using HTTPS
+        key="access_token",
+        value=access_token,
+        httponly=True,  # Protects the cookie
+        samesite="Lax",
+        secure=False  # Set True if using HTTPS
     )
     return response
 
 @router.get("/read-cookie")
 def read_cookie(access_token: str = Cookie(None)):
+    """Read the access token from the cookie.
+
+    Args:
+        access_token (str): The access token from the cookie.
+
+    Returns:
+        dict: A dictionary containing the access token.
+    
+    Raises:
+        HTTPException: If the access token cookie is not found.
+    """
     if access_token is None:
         logger.warning("Cookie 'access_token' not found in request headers")
         raise HTTPException(status_code=400, detail="Cookie 'access_token' not found")
@@ -85,6 +127,14 @@ def read_cookie(access_token: str = Cookie(None)):
 
 @router.get("/debug-cookie")
 async def debug_cookie(request: Request):
+    """Debug endpoint to check cookies in the request.
+
+    Args:
+        request (Request): The incoming request.
+
+    Returns:
+        dict: A dictionary containing the token from the cookie if found.
+    """
     cookies = request.cookies
     logger.info(f"All cookies in request: {cookies}")
     token = cookies.get("access_token")
@@ -92,6 +142,15 @@ async def debug_cookie(request: Request):
 
 @router.post("/set-cookies")
 async def set_cookies(request: Request, response: Response):
+    """Set a fake session cookie.
+
+    Args:
+        request (Request): The incoming request.
+        response (Response): The response object.
+
+    Returns:
+        Response: The response object with the cookie set.
+    """
     response.set_cookie(key="fakesession123", value="fake123-cookie-session-value")
 
 @router.put("/users/{user_id}")
@@ -102,6 +161,18 @@ def update_user_route(
     username: str = Form(...),
     email: str = Form(...),
 ):
+    """Update user information.
+
+    Args:
+        request (Request): The incoming request.
+        user_id (int): The ID of the user to update.
+        db (Session): The database session.
+        username (str): The new username.
+        email (str): The new email.
+
+    Returns:
+        dict: A dictionary containing the updated user information, or an error message.
+    """
     updated_user = update_user(db, user_id, email, username)
     if updated_user:
         return {"username": updated_user.username, "email": updated_user.email}
@@ -109,44 +180,16 @@ def update_user_route(
         return {"error": "User not found"}, 404
 
 @router.delete("/users/{user_id}")
-def users(request: Request, user_id: int, db: Session = Depends(get_db)):
+def delete_user_route(request: Request, user_id: int, db: Session = Depends(get_db)):
+    """Delete a user by their ID.
+
+    Args:
+        request (Request): The incoming request.
+        user_id (int): The ID of the user to delete.
+        db (Session): The database session.
+
+    Returns:
+        RedirectResponse: Redirects to the URL of the deleted user.
+    """
     delete_user(db, user_id)
     return RedirectResponse(url=f'/users/{user_id}', status_code=200)
-
-@router.get("/tasks")
-async def tasks(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    data = get_tasks_by_user(db, current_user.id)
-    return templates.TemplateResponse(request, 'tasks.html', {"data": data})
-
-@router.get("/tasks/{task_id}", response_class=HTMLResponse)
-def users(request: Request, task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    data = get_task_by_id(db, current_user.id, task_id)
-    return templates.TemplateResponse(request, 'tasks.html', {"data": data})
-
-@router.post("/tasks")
-def users(task: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    create_task(db, task.description, current_user.id)
-    return {"message": "Task created successfully"}
-
-@router.put("/tasks/{task_id}")
-def users(request: Request, task_id: int, name: str = Form(...), description: str = Form(...), status: bool = Form(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    update_task(db, current_user.id, task_id, name, description, status)
-    return RedirectResponse(url='/tasks', status_code=303)
-
-@router.delete("/tasks/{task_id}")
-def users(request: Request, task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    delete_task(db, current_user.id, task_id)
-    return RedirectResponse(url='/tasks', status_code=303)
-
-@router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}

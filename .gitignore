@@ -1,3 +1,5 @@
 venv/
 .venv/
 .env
+.pycahe
+.test.db

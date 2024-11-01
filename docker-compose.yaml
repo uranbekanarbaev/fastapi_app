@@ -8,9 +8,9 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://user:password@db/dbname  # Update with your credentials
+      - DATABASE_URL=postgresql://user:password@db/dbname
     volumes:
-      - .:/app  # Mount the current directory to the container
+      - .:/app
 
   db:
     image: postgres:latest
@@ -23,7 +23,7 @@ services:
   
   test:
     build: .
-    command: ["pytest", "tests"]  # Adjust the path to your tests if needed
+    command: ["pytest", "tests"]
     depends_on:
       - db
 
