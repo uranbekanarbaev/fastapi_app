@@ -29,18 +29,30 @@ This project is a Python Backend Developer assignment focused on creating an API
 ## Project Structure
 
 fastapi_app
+
 ├── db/ # Database models │ 
+
 ├── auth/ # user_jwt_token generation and authentication │ 
-├── router/ # API routes  
+
+├── router/ # API routes  |
+
 ├── tests/ # Test cases │ 
+
 ├── app.py # Application entry point │  
+
 ├── Dockerfile │ 
+
 ├── docker-compose.yml │ 
+
 ├── .gitignore # gitignore | 
+
 ├── requirements.txt # required dependencies | 
+
 ├── templates/ # html templates | 
+
 ├── loggs/ # logger configuration │ 
-└── README.md # Project documentation
+
+└── README.md # Project documentation |
 
 ## Getting Started
 
