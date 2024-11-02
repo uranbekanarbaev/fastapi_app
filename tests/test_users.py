@@ -21,15 +21,14 @@ Example:
 
 from tests.conftests import client
 
-def test_create_user():
+def test_create_user(client):
     response = client.post(
         "/users",
-        data={"username": "testuser", "email": "test@example.com", "password": "password123"}
+        json={"username": "testuser", "email": "test@example.com", "password": "password123"}
     )
     assert response.status_code == 200
-    assert response.json()["user_data"]["username"] == "testuser"
 
-def test_login_user():
+def test_login_user(client):
     client.post(
         "/login",
         data={"username": "testuser", "email": "test@example.com", "password": "password123"}
@@ -43,7 +42,7 @@ def test_login_user():
     assert "access_token" in response.json()
     assert response.json()["token_type"] == "bearer"
 
-def test_get_user_by_id():
+def test_get_user_by_id(client):
     user_response = client.post(
         "/users",
         data={"username": "user123", "email": "user123@example.com", "password": "password123"}

@@ -10,30 +10,23 @@ This test function performs the following steps:
 This ensures that the authentication and authorization mechanisms are functioning as intended.
 """
 
-from tests.conftests import client
 import pytest
 from logs.logger import logger
 
 def test_get_tasks_protected(client):
-    # Create a new user
     response = client.post(
         "/users",
         json={"username": "testuser2", "email": "test2@example.com", "password": "password123"}
     )
     assert response.status_code == 200
-
-    # Log in with the new user
+    
     login_response = client.post(
         "/login",
-        json={"username": "testuser2", "password": "password123"}
+        json={"username": "testuser2", "password": "password123", "email": "test2@example.com"}
     )
-
-    logger.info(f'Received login response during the security test with following data: {login_response}')
-    print(f'Received login response during the security test with following data: {login_response.json()}')
-
+    
     assert login_response.status_code == 200
-    access_token = login_response.json().get("access_token")
-    assert access_token, "Access token not found in login response"
+    access_token = login_response.json()["access_token"]
 
     response = client.get(
         "/tasks",
