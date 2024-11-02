@@ -17,7 +17,7 @@ This project is a Python Backend Developer assignment focused on creating an API
 - [Contributing](#contributing)
 - [License](#license)
 
-## Technologies Used
+## [Technologies Used](#technologies-used)
 
 - FastAPI
 - SQLAlchemy (or Django ORM)
