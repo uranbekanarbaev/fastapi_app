@@ -6,3 +6,7 @@ pytest_cache/
 .pytest_cache/
 *.pyc
 .test.db
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

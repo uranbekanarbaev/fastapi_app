@@ -31,7 +31,7 @@ def test_create_user():
 
 def test_login_user():
     client.post(
-        "/users",
+        "/login",
         data={"username": "testuser", "email": "test@example.com", "password": "password123"}
     )
     

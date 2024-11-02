@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db.crud import get_user_by_username
 from auth.jwt_gen import SECRET_KEY, ALGORITHM
-from loggs.logger import logger
+from logs.logger import logger
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,

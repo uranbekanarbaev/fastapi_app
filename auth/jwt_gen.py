@@ -5,7 +5,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 import os
-from loggs.logger import logger
+from logs.logger import logger
 
 load_dotenv()
 
