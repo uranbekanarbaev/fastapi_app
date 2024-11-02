@@ -26,7 +26,3 @@ services:
     command: ["pytest", "tests"]
     depends_on:
       - db
-
-
-volumes:
-  db_data:

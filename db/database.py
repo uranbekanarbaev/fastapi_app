@@ -1,3 +1,13 @@
+"""
+Database module.
+
+This module sets up a connection to a SQLite database, creates a session,
+and provides functionality for interacting with the database in the application.
+
+Functions:
+- get_db: Creates and returns a new database session.
+"""
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

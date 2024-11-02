@@ -42,11 +42,19 @@ To get a local copy up and running, follow these steps.
 
 ### Clone the Repository
 
-```bash
+## Commands to Do:
+
+Clone github repository:
 git clone https://github.com/uranbekanarbaev/fastapi_app.git
+
+Switch to the "fastapi_app" folder:
 cd fastapi_app
 
+Then install requirements.txt: 
 pip install -r requirements.txt
+
+Dont forget to test application on local uvicorn server:
+uvicorn app:app --reload
 
 
 ### API Endpoints
@@ -57,6 +65,7 @@ GET /users/{user_id}: Retrieve information about a specific user
 POST /users: Create a new user
 PUT /users/{user_id}: Update user information
 DELETE /users/{user_id}: Delete a user
+
 Tasks
 GET /tasks: Retrieve a list of all tasks
 GET /tasks/{task_id}: Retrieve information about a specific task
@@ -70,46 +79,41 @@ Access to tasks is limited to their respective owners.
 Running the Application
 Build and Run Containers (if using Docker)
 
-Use Docker Compose to build and start your application and the database:
 
-bash
-Copy code
+### Use Docker Compose to build and start your application and the database:
+
 docker-compose up --build
-Access the Application
+
+
+To access your application switch to the:
 
 Open your browser and navigate to http://localhost:8000.
 
-Check API Documentation
+### Check API Documentation
 
 FastAPI provides an automatic interactive API documentation at http://localhost:8000/docs.
 
-Testing the Application
+### Testing the Application
 To run the tests, follow these steps:
-
-Run Tests
 
 You can run your tests inside the Docker container by executing:
 
-bash
-Copy code
 docker-compose run test
-Or directly using:
 
-bash
-Copy code
-pytest
-View Test Results
+
+Or directly using:
+PYTHONPATH=. pytest tests/
 
 The test results will be displayed in the terminal. Ensure that all tests pass before deploying.
 
-Additional Information
+### Additional Information
 Code Structure: The project is organized into folders to separate concerns, including models, routers, and tests.
 Documentation: Each module and function is documented with docstrings for better understanding.
 Server Deployment: Video demonstrations of server deployment and usage examples are included in the repository.
 Contributing
 Contributions are welcome! Please feel free to submit a pull request.
 
-License
+### License
 This project is licensed under the MIT License.
 
 

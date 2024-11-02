@@ -1,7 +1,38 @@
+"""
+This module provides functions for interacting with the user and task data models using SQLAlchemy.
+
+It includes functionality to create, read, update, and delete users and tasks in the database. 
+Additionally, it implements user authentication and password hashing.
+
+Functions:
+- get_user_by_username: Retrieve a user by their username.
+- get_user_by_user_id: Retrieve a user by their ID.
+- get_all_users: Retrieve all users from the database.
+- create_user: Create a new user in the database.
+- update_user: Update an existing user in the database.
+- delete_user: Delete a user from the database.
+- authenticate_user: Authenticate a user by verifying their username and password.
+- create_task: Create a new task for a user in the database.
+- get_tasks_by_user: Retrieve all tasks for a specific user.
+- get_task_by_id: Retrieve a specific task by its ID and owner ID.
+- update_task: Update an existing task in the database.
+- delete_task: Delete a specific task from the database.
+
+Dependencies:
+- SQLAlchemy: For database interactions.
+- Passlib: For password hashing.
+- Logging: For logging important events and errors.
+
+Usage:
+This module is intended to be used as part of a FastAPI application. It assumes an existing database setup
+and defined User and Task models.
+"""
+
+
 from sqlalchemy.orm import Session
 from .models import User, Task
 from passlib.context import CryptContext
-from loggs.logger import logger
+from logs.logger import logger
 from typing import List, Optional
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -16,7 +47,7 @@ def get_user_by_username(db: Session, username: str) -> Optional[User]:
     Returns:
         Optional[User]: The user object if found, otherwise None.
     """
-    logger.info(username)
+    logger.info(f'Searching the database for the following username: {username}')
     return db.query(User).filter(User.username == username).first()
 
 def get_user_by_user_id(db: Session, user_id: int) -> Optional[User]:
@@ -29,7 +60,7 @@ def get_user_by_user_id(db: Session, user_id: int) -> Optional[User]:
     Returns:
         Optional[User]: The user object if found, otherwise None.
     """
-    logger.info(f'looking for the user with following {user_id}')
+    logger.info(f'looking for the user with following in id in database: {user_id}')
     return db.query(User).filter(User.id == user_id).first()
 
 def get_all_users(db: Session) -> List[User]:
@@ -84,7 +115,7 @@ def update_user(db: Session, user_id: int, email: str, username: str) -> Optiona
     Returns:
         Optional[User]: The updated user object if successful, otherwise None.
     """
-    user = db.query(User).filter(User.id == user_id).first()
+    user = get_user_by_user_id(db, user_id=user_id)
     
     if user:
         user.username = username
@@ -106,7 +137,7 @@ def delete_user(db: Session, user_id: int) -> None:
     Returns:
         None
     """
-    user = db.query(User).filter(User.id == user_id).first()
+    user = get_user_by_user_id(db, user_id=user_id)
     
     if user:
         db.delete(user)

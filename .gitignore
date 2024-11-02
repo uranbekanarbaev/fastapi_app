@@ -1,5 +1,8 @@
 venv/
 .venv/
 .env
-.pycahe
+.pycache/
+pytest_cache/
+.pytest_cache/
+*.pyc
 .test.db

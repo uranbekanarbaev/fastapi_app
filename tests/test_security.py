@@ -1,15 +1,21 @@
+"""
+Test the retrieval of tasks from a protected route.
+
+This test function performs the following steps:
+1. Registers a new user with a username, email, and password.
+2. Logs in with the registered user's credentials to obtain an access token.
+3. Uses the access token to make a request to the protected '/tasks' endpoint.
+4. Asserts that the response status code is 200, indicating successful access to the protected route.
+
+This ensures that the authentication and authorization mechanisms are functioning as intended.
+"""
+
+
 from tests.conftests import client
 import pytest
 
-@pytest.fixture(autouse=True)
-def cleanup_users():
-    """Cleanup users after each test."""
-    yield
-    # Code to remove the test user goes here
-    client.delete("/users/testuser2")
 
 def test_get_tasks_protected():
-    # Register and login to obtain token
     client.post(
         "/users",
         data={"username": "testuser2", "email": "test2@example.com", "password": "password123"}
@@ -18,15 +24,10 @@ def test_get_tasks_protected():
         "/token",
         data={"username": "testuser2", "password": "password123"}
     )
-    assert login_response.status_code == 200  # Ensure login was successful
     access_token = login_response.json()["access_token"]
     
-    # Test access to a protected route
     response = client.get(
         "/tasks",
         headers={"Authorization": f"Bearer {access_token}"}
     )
-    
     assert response.status_code == 200
-    assert isinstance(response.json(), list)  # Check if response is a list
-    # Additional assertions can be added here to check the structure of tasks

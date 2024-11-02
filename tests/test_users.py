@@ -1,3 +1,24 @@
+"""
+Test Module for User Management API
+
+This module contains unit tests for the user management endpoints of the FastAPI application.
+It covers the following functionalities:
+
+1. User Creation: Tests the endpoint for creating a new user.
+2. User Login: Tests the login functionality and token retrieval.
+3. User Retrieval: Tests fetching a user by their unique ID.
+
+The tests utilize FastAPI's TestClient to simulate requests to the API and assert expected responses.
+
+Usage:
+    Run the tests using pytest. Ensure the test database is properly set up before running the tests.
+
+Example:
+    To run the tests, execute the following command in your terminal:
+        pytest -v tests/test_user_management.py
+"""
+
+
 from tests.conftests import client
 
 def test_create_user():

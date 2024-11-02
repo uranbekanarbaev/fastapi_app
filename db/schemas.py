@@ -1,3 +1,21 @@
+"""
+This module defines Pydantic models for user and task management in the application.
+
+Models:
+- StatusEnum: An enumeration representing the possible statuses of a task.
+- UserCreate: A model for creating a new user, including validation for the user's name, 
+  email, and password.
+- TaskCreate: A model for creating a new task, including attributes for title, description, 
+  and status.
+- UserResponse: A model for representing a user's information in responses, providing the 
+  user's ID, username, and email.
+
+Usage:
+These models are used for validating and serializing data in API requests and responses, 
+ensuring that input data meets the required specifications and formats.
+"""
+
+
 from pydantic import BaseModel, EmailStr, constr
 from typing import Optional
 from enum import Enum
@@ -20,7 +38,7 @@ class UserCreate(BaseModel):
         email (EmailStr): The email address of the user, validated as an email format.
         password (constr): The password for the user, must be at least 8 characters long.
     """
-    name: str
+    username: str
     email: EmailStr
     password: constr(min_length=8)
 
@@ -32,8 +50,8 @@ class TaskCreate(BaseModel):
         description (str): A detailed description of the task.
         status (StatusEnum): The current status of the task, using the StatusEnum.
     """
-    title: str
-    description: str
+    title: constr(max_length=50)
+    description: constr(max_length=500)
     status: StatusEnum
 
 class UserResponse(BaseModel):
